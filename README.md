@@ -39,8 +39,8 @@ Tells each rep what to practice this week. ~15 EUR/month vs. Gong at 9,300 EUR/y
 The [`skills/`](skills/) folder is a community library of reusable Claude Code Skills.
 Drop one into your `~/.claude/skills/` and it loads automatically when relevant.
 
-Currently shipping: [example-pricing-coach](skills/example-pricing-coach/SKILL.md) (template).
-Add yours via PR — see [skills/README.md](skills/README.md).
+Currently shipping: [example-pricing-coach](skills/example-pricing-coach/SKILL.md) (template) and [anti-ai-voice](skills/anti-ai-voice/SKILL.md) (strip AI-tells from external copy).
+Add yours via PR, see [skills/README.md](skills/README.md).
 
 ---
 
