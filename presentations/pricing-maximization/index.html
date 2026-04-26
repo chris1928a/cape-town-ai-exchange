@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing Maximization &middot; Chris Erler &middot; Cape Town Exchange</title>
+<meta name="description" content="How a 6-studio operator built a systematic OTA edge. 8 frameworks, live pipeline, 3 case studies. By Chris Erler at Cape Town Exchange 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0C1727;
+    --bg-soft:   #0F1C30;
+    --card:      #16284A;
+    --card-soft: #1A2F55;
+    --line:      #233A5E;
+
+    --cyan:      #00C8FF;
+    --teal:      #00D4AA;
+    --yellow:    #FFD93D;
+    --red:       #FF4D6A;
+    --blue:      #1080C6;
+    --purple:    #A88CFF;
+
+    --white:     #F8FAFC;
+    --muted:     #8899AA;
+    --subtle:    #556677;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    overflow: hidden;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 6vh 9vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    overflow: hidden;
+    border-top: 4px solid var(--cyan);
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 1.6rem;
+  }
+  h1 {
+    font-size: clamp(3rem, 6.5vw, 6rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+    color: var(--white);
+  }
+  h1 .accent { color: var(--cyan); }
+  h2 {
+    font-size: clamp(2.0rem, 4.0vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.0rem;
+    color: var(--white);
+  }
+  h2 .accent { color: var(--cyan); }
+  .lede {
+    font-size: clamp(1.0rem, 1.4vw, 1.3rem);
+    color: var(--muted);
+    max-width: 64ch;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+  .punch {
+    margin-top: 1.4rem;
+    font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    color: var(--cyan);
+    font-weight: 600;
+    max-width: 70ch;
+  }
+
+  .slide-footer {
+    position: absolute;
+    left: 9vw;
+    right: 9vw;
+    bottom: 2.5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    color: var(--subtle);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .page-no { color: var(--cyan); font-weight: 700; }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 1.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+    opacity: 0.35;
+    transition: opacity 0.2s;
+  }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: var(--card);
+    color: var(--white);
+    border: 1px solid var(--line);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav button:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* Stat cards */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+    margin-top: 0.5rem;
+    max-width: 1100px;
+  }
+  .stat {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 1.1rem 1.4rem;
+  }
+  .stat .big { font-size: 1.9rem; font-weight: 800; color: var(--cyan); line-height: 1.1; }
+  .stat .sub { font-size: 0.95rem; color: var(--muted); margin-top: 0.3rem; }
+  .stat .cap { font-size: 0.7rem; color: var(--subtle); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 0.5rem; font-weight: 700; }
+  .stat.teal   { border-color: var(--teal);   } .stat.teal   .big { color: var(--teal); }
+  .stat.yellow { border-color: var(--yellow); } .stat.yellow .big { color: var(--yellow); }
+  .stat.red    { border-color: var(--red);    } .stat.red    .big { color: var(--red); }
+  .stat.purple { border-color: var(--purple); } .stat.purple .big { color: var(--purple); }
+  .stat.blue   { border-color: var(--blue);   } .stat.blue   .big { color: var(--blue); }
+
+  /* Bullets */
+  .bullets { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.5rem; max-width: 1000px; }
+  .b {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 1rem;
+    align-items: start;
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.5;
+    background: var(--card);
+    padding: 0.85rem 1.2rem;
+    border-radius: 10px;
+    border-left: 3px solid var(--cyan);
+  }
+  .b .dot { width: 10px; height: 10px; background: var(--cyan); margin-top: 9px; border-radius: 2px; }
+  .b.teal   { border-color: var(--teal);   } .b.teal   .dot { background: var(--teal); }
+  .b.yellow { border-color: var(--yellow); } .b.yellow .dot { background: var(--yellow); }
+  .b.red    { border-color: var(--red);    } .b.red    .dot { background: var(--red); }
+  .b.purple { border-color: var(--purple); } .b.purple .dot { background: var(--purple); }
+
+  /* Two-column compare */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .col {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.3rem 1.5rem;
+    border-top: 3px solid var(--cyan);
+  }
+  .col.bad { border-color: var(--red); }
+  .col-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 0.9rem;
+  }
+  .col.bad .col-label { color: var(--red); }
+  .col ul { list-style: none; }
+  .col li {
+    font-size: 1rem;
+    color: var(--muted);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .col li:last-child { border: none; }
+  .col li::before {
+    content: "+ ";
+    color: var(--cyan);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .col.bad li::before { content: "- "; color: var(--red); }
+
+  /* Loop */
+  .loop {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+  }
+  .loop-step {
+    background: var(--card);
+    border-top: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 1rem 0.8rem;
+    text-align: center;
+  }
+  .loop-step .lbl {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .loop-step.teal   { border-color: var(--teal);   } .loop-step.teal   .lbl { color: var(--teal); }
+  .loop-step.yellow { border-color: var(--yellow); } .loop-step.yellow .lbl { color: var(--yellow); }
+  .loop-step.purple { border-color: var(--purple); } .loop-step.purple .lbl { color: var(--purple); }
+  .loop .arrow { color: var(--muted); font-size: 1.4rem; font-weight: 700; }
+
+  /* Calendar strip */
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
+    margin: 1rem 0 1.2rem;
+  }
+  .strip-cell {
+    background: var(--card);
+    padding: 0.7rem 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    border-bottom: 4px solid var(--cyan);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .strip-cell.teal   { border-color: var(--teal);   color: var(--teal); }
+  .strip-cell.yellow { border-color: var(--yellow); color: var(--yellow); }
+  .strip-cell.red    { border-color: var(--red);    color: var(--red); }
+  .strip-cell.purple { border-color: var(--purple); color: var(--purple); }
+  .strip-cell.blue   { border-color: var(--blue);   color: var(--blue); }
+
+  /* Waterfall */
+  .waterfall { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.8rem 0; max-width: 900px; }
+  .wf-row {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 0.85rem 1.2rem;
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 1.2rem;
+    align-items: center;
+  }
+  .wf-label { font-weight: 800; color: var(--cyan); font-size: 0.95rem; letter-spacing: 0.06em; }
+  .wf-text { color: var(--muted); font-size: 0.95rem; }
+  .wf-row.teal   { border-color: var(--teal);   } .wf-row.teal   .wf-label { color: var(--teal); }
+  .wf-row.yellow { border-color: var(--yellow); } .wf-row.yellow .wf-label { color: var(--yellow); }
+
+  /* Equation block */
+  .eq {
+    background: var(--card);
+    border-left: 4px solid var(--yellow);
+    border-radius: 10px;
+    padding: 1.1rem 1.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    margin-bottom: 0.8rem;
+    color: var(--white);
+  }
+  .eq .result { color: var(--yellow); font-weight: 700; font-size: 1.25rem; display: block; margin-top: 0.6rem; }
+  .warn {
+    background: var(--card);
+    border-left: 4px solid var(--red);
+    border-radius: 10px;
+    padding: 0.95rem 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+  .warn .h { color: var(--red); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.3rem; }
+  .warn .s { color: var(--muted); font-size: 0.92rem; }
+
+  /* Day grid */
+  .daygrid-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0.6rem 0 1.0rem; }
+  .daygrid {
+    background: var(--card);
+    border-top: 3px solid var(--red);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+  }
+  .daygrid.good { border-color: var(--teal); }
+  .daygrid .h {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.7rem;
+  }
+  .daygrid.good .h { color: var(--teal); }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .day {
+    text-align: center;
+    padding: 0.5rem 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--subtle);
+    border-radius: 5px;
+    background: var(--bg-soft);
+  }
+  .day.lock { background: var(--red); color: var(--bg); }
+  .day.split { background: var(--teal); color: var(--bg); }
+
+  /* Two big preset cards */
+  .preset-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+  .preset {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+  }
+  .preset.teal { border-color: var(--teal); }
+  .preset .lbl { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cyan); }
+  .preset.teal .lbl { color: var(--teal); }
+  .preset .num { font-size: 2.4rem; font-weight: 800; color: var(--white); margin: 0.5rem 0 0.4rem; line-height: 1; }
+  .preset .desc { color: var(--muted); font-size: 0.95rem; }
+
+  /* Numbered hierarchy */
+  .levers { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.5rem; max-width: 1000px; }
+  .lever {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 1rem 1.3rem;
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 1rem;
+    align-items: center;
+  }
+  .lever.teal { border-color: var(--teal); }
+  .lever.red  { border-color: var(--red); }
+  .lever .n { font-size: 1.8rem; font-weight: 800; color: var(--cyan); }
+  .lever.teal .n { color: var(--teal); }
+  .lever.red  .n { color: var(--red); }
+  .lever h4 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.2rem; }
+  .lever p  { font-size: 0.92rem; color: var(--muted); }
+
+  /* Code snippet */
+  .code {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 0.95rem 1.3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--white);
+    margin-top: 1rem;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  /* Mutation cards */
+  .mut-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; margin-top: 0.5rem; }
+  .mut {
+    background: var(--card);
+    border-top: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 0.95rem 1.1rem;
+  }
+  .mut.teal   { border-color: var(--teal); }
+  .mut.yellow { border-color: var(--yellow); }
+  .mut .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 0.4rem;
+  }
+  .mut.teal   .name { color: var(--teal); }
+  .mut.yellow .name { color: var(--yellow); }
+  .mut .d { font-size: 0.85rem; color: var(--muted); }
+
+  /* Case study rows */
+  .case-rows { display: flex; flex-direction: column; gap: 0.55rem; max-width: 1100px; margin: 0.5rem 0 0.7rem; }
+  .case-row {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .case-row .k {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .case-row .v { color: var(--white); font-size: 1rem; }
+  .case-row.purple { border-color: var(--purple); } .case-row.purple .k { color: var(--purple); }
+  .case-row.teal   { border-color: var(--teal);   } .case-row.teal   .k { color: var(--teal); }
+  .case-row.yellow { border-color: var(--yellow); } .case-row.yellow .k { color: var(--yellow); }
+  .case-row.lesson { border-color: var(--yellow); }
+  .case-row.lesson .v { font-weight: 700; }
+
+  /* Playbook flow */
+  .playbook {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.6rem;
+  }
+  .pb {
+    background: var(--card);
+    border-top: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 1rem 0.9rem;
+  }
+  .pb .n { font-size: 1.5rem; font-weight: 800; color: var(--cyan); line-height: 1; }
+  .pb .lbl { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--white); margin: 0.4rem 0 0.3rem; }
+  .pb .d { font-size: 0.78rem; color: var(--muted); }
+  .pb.teal   { border-color: var(--teal);   } .pb.teal   .n { color: var(--teal); }
+  .pb.yellow { border-color: var(--yellow); } .pb.yellow .n { color: var(--yellow); }
+  .pb.purple { border-color: var(--purple); } .pb.purple .n { color: var(--purple); }
+  .playbook .arrow { color: var(--muted); font-size: 1.2rem; font-weight: 700; }
+
+  /* Title slide */
+  .title-eyebrow { color: var(--cyan); font-size: 0.85rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 700; }
+  .title-h1 { font-size: clamp(3.5rem, 8vw, 6.5rem); font-weight: 800; line-height: 1; margin: 1.2rem 0 1.5rem; letter-spacing: -0.03em; }
+  .title-sub { font-size: clamp(1.4rem, 2.8vw, 2.2rem); color: var(--cyan); font-weight: 500; line-height: 1.2; max-width: 70ch; }
+  .title-line { width: 100px; height: 4px; background: var(--cyan); margin: 1.8rem 0 1.2rem; }
+  .title-meta { font-size: 1rem; color: var(--white); font-weight: 600; }
+  .title-event { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; margin-top: 0.4rem; }
+
+  /* Closing slide */
+  .close-h1 { font-size: clamp(4rem, 10vw, 8rem); font-weight: 900; line-height: 1; letter-spacing: -0.04em; margin-bottom: 1.5rem; }
+  .close-line { width: 100px; height: 4px; background: var(--cyan); margin: 0.8rem 0 1.5rem; }
+  .close-name { font-size: 1.6rem; font-weight: 700; color: var(--white); margin-bottom: 0.3rem; }
+  .close-mail { font-size: 1.2rem; color: var(--cyan); margin-bottom: 0.3rem; }
+  .close-cal  { font-size: 0.95rem; color: var(--muted); }
+  .close-tag  { font-size: 1rem; color: var(--yellow); letter-spacing: 0.18em; font-weight: 600; margin-top: 1.8rem; }
+
+  /* Quote */
+  .quote {
+    background: var(--card);
+    border-left: 4px solid var(--cyan);
+    border-radius: 10px;
+    padding: 1.1rem 1.5rem;
+    font-size: clamp(1.1rem, 1.7vw, 1.5rem);
+    color: var(--white);
+    font-style: italic;
+    margin: 0.8rem 0 1.2rem;
+    max-width: 900px;
+  }
+
+  /* Helper micro-card "discount stack" visual */
+  .stack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; max-width: 800px; }
+  .stack-item {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 0.7rem;
+    text-align: center;
+    border-top: 3px solid var(--yellow);
+  }
+  .stack-item .n { font-size: 1.4rem; font-weight: 800; color: var(--yellow); }
+  .stack-item .l { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.2rem; }
+
+  @media (max-width: 900px) {
+    .stat-grid, .compare, .preset-pair, .daygrid-pair { grid-template-columns: 1fr; }
+    .mut-grid, .stack { grid-template-columns: 1fr 1fr; }
+    .loop, .playbook { grid-template-columns: 1fr; }
+    .loop .arrow, .playbook .arrow { display: none; }
+    .case-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- SLIDE 1 - TITLE -->
+<section class="slide active" data-slide="1">
+  <div class="title-eyebrow">Erler Ventures</div>
+  <div class="title-h1">Pricing <span style="color:var(--cyan)">Maximization.</span></div>
+  <div class="title-sub">How a 6-studio operator built a systematic OTA edge.</div>
+  <div class="title-line"></div>
+  <div class="title-meta">Chris Erler &middot; Erler Ventures</div>
+  <div class="title-event">Cape Town Exchange &middot; 2026</div>
+</section>
+
+<!-- SLIDE 2 - THE SETUP -->
+<section class="slide" data-slide="2">
+  <div class="eyebrow">The Setup</div>
+  <h2>Six studios. One location. <span class="accent">One channel.</span></h2>
+  <div class="stat-grid">
+    <div class="stat"><div class="big">6</div><div class="sub">studios in Bavaria, 8 min from Legoland</div><div class="cap">Fixed Inventory</div></div>
+    <div class="stat teal"><div class="big">1</div><div class="sub">OTA channel: a single attack surface</div><div class="cap">Focused Channel</div></div>
+    <div class="stat yellow"><div class="big">226</div><div class="sub">days of peak season per year</div><div class="cap">Legoland Open Window</div></div>
+    <div class="stat purple"><div class="big">9+</div><div class="sub">event clusters per year (BW + Bavaria)</div><div class="cap">Demand Shaping</div></div>
+  </div>
+  <div class="punch">Constraint = clarity. Small enough to instrument. Big enough to matter.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">02 / 20</span></div>
+</section>
+
+<!-- SLIDE 3 - DEFAULT TRAP -->
+<section class="slide" data-slide="3">
+  <div class="eyebrow">The Problem</div>
+  <h2>OTAs optimize for their margin. <span style="color:var(--red)">Not yours.</span></h2>
+  <div class="compare">
+    <div class="col bad">
+      <div class="col-label">Default Operator</div>
+      <ul>
+        <li>Gut-feel pricing</li>
+        <li>Quarterly review at best</li>
+        <li>Accept platform defaults</li>
+        <li>Discount stack untracked</li>
+        <li>No change-log, no learning loop</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="col-label">Code-First Operator</div>
+      <ul>
+        <li>Daily velocity check</li>
+        <li>Reverse-engineered presets</li>
+        <li>API-driven mutations</li>
+        <li>Discount stack capped by design</li>
+        <li>Change-log compounds into a playbook</li>
+      </ul>
+    </div>
+  </div>
+  <div class="punch" style="color:var(--yellow)">Result: predictable money left on the table for the default group.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">03 / 20</span></div>
+</section>
+
+<!-- SLIDE 4 - THE THESIS -->
+<section class="slide" data-slide="4">
+  <div class="eyebrow">The Thesis</div>
+  <h1><span class="accent">Velocity</span> beats price.</h1>
+  <div class="quote">&ldquo;One booking today is worth two bookings next month.&rdquo;</div>
+  <div class="loop">
+    <div class="loop-step"><div class="lbl">Bookings</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="loop-step teal"><div class="lbl">Ranking Lift</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="loop-step yellow"><div class="lbl">Traffic</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="loop-step purple"><div class="lbl">More Bookings</div></div>
+  </div>
+  <div class="punch">Reframe: optimize for booking-velocity, not price-per-night. The ranking-loop compounds.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">04 / 20</span></div>
+</section>
+
+<!-- SLIDE 5 - F1: VELOCITY LOOP -->
+<section class="slide" data-slide="5">
+  <div class="eyebrow">Framework 01 &middot; Ranking</div>
+  <h2>Velocity-Driven Ranking Loop</h2>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>OTAs reward freshness. Stale listings decay quietly.</div></div>
+    <div class="b teal"><div class="dot"></div><div>Decision rule: many small bookings beat few high-margin nights.</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Trigger: recent-bookings-count drops below the 7-day baseline.</div></div>
+    <div class="b purple"><div class="dot"></div><div>Action: discount-stack toggle, not a base-price cut.</div></div>
+  </div>
+  <div class="punch">Velocity is leading. Price is lagging.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">05 / 20</span></div>
+</section>
+
+<!-- SLIDE 6 - F2: 6-WEEK CLUSTER -->
+<section class="slide" data-slide="6">
+  <div class="eyebrow">Framework 02 &middot; Calendar</div>
+  <h2>The 6-Week Event Cluster</h2>
+  <div class="strip">
+    <div class="strip-cell">Easter</div>
+    <div class="strip-cell teal">May Hype</div>
+    <div class="strip-cell yellow">Ascension</div>
+    <div class="strip-cell red">Pentecost</div>
+    <div class="strip-cell purple">Corpus C.</div>
+    <div class="strip-cell blue">Summer</div>
+  </div>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>Isolated-day tuning fails. Events cluster.</div></div>
+    <div class="b teal"><div class="dot"></div><div>Rule: never tune a single day without checking the next 6 weeks.</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Cost of skipping: cluster-gaps trigger leak vectors. See Case 02.</div></div>
+  </div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">06 / 20</span></div>
+</section>
+
+<!-- SLIDE 7 - F3: FEE NORMALIZATION -->
+<section class="slide" data-slide="7">
+  <div class="eyebrow">Framework 03 &middot; Economics</div>
+  <h2>Fee Normalization</h2>
+  <div class="waterfall">
+    <div class="wf-row"><div class="wf-label">List Price</div><div class="wf-text">What the host enters into the system.</div></div>
+    <div class="wf-row teal"><div class="wf-label">Guest Price</div><div class="wf-text">List price &times; 1.1765 (OTA add-on).</div></div>
+    <div class="wf-row yellow"><div class="wf-label">Host Net</div><div class="wf-text">Guest price &times; 0.907 (after VAT).</div></div>
+  </div>
+  <div class="punch">Anchor on guest-price. That is what ranking sees.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">07 / 20</span></div>
+</section>
+
+<!-- SLIDE 8 - F4: BENCHMARK PARITY -->
+<section class="slide" data-slide="8">
+  <div class="eyebrow">Framework 04 &middot; Benchmark</div>
+  <h2>Benchmark Parity</h2>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>Anchor on a live competitor calendar (276-day window).</div></div>
+    <div class="b teal"><div class="dot"></div><div>Position 5 to 10% below the anchor for room-class differential.</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Recalibrate annually, plus after every anomaly.</div></div>
+    <div class="b purple"><div class="dot"></div><div>Trigger: more than 20% delta to the anchor = recalibration signal.</div></div>
+  </div>
+  <div class="punch">Lean data beats market research. One live competitor is enough.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">08 / 20</span></div>
+</section>
+
+<!-- SLIDE 9 - F5: STACKING TRAP -->
+<section class="slide" data-slide="9">
+  <div class="eyebrow">Framework 05 &middot; Discounts</div>
+  <h2>The Discount Stacking Trap</h2>
+  <div class="stack" style="margin-top:0.4rem">
+    <div class="stack-item"><div class="n">10%</div><div class="l">Mobile</div></div>
+    <div class="stack-item"><div class="n">10%</div><div class="l">Early Bird</div></div>
+    <div class="stack-item"><div class="n">10%</div><div class="l">Loyalty</div></div>
+    <div class="stack-item"><div class="n">10%</div><div class="l">Weekly</div></div>
+  </div>
+  <div class="eq" style="margin-top:1rem">
+    Mobile &nbsp;x&nbsp; Early Bird &nbsp;x&nbsp; Loyalty &nbsp;x&nbsp; Weekly
+    <span class="result">= 0.9 ^ 4 &nbsp;=&nbsp; ~ 34% off</span>
+  </div>
+  <div class="warn">
+    <div class="h">Without preset discipline, the stack leaks to 47%.</div>
+    <div class="s">One real incident: 18 nights at peak, all four discounts firing through a preset gap.</div>
+  </div>
+  <div class="punch">Cap by preset-driven blackouts. Not by percent ceilings.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">09 / 20</span></div>
+</section>
+
+<!-- SLIDE 10 - F6: SUNDAY SPLIT -->
+<section class="slide" data-slide="10">
+  <div class="eyebrow">Framework 06 &middot; Segments</div>
+  <h2>The Sunday-Split Pattern</h2>
+  <div class="daygrid-pair">
+    <div class="daygrid">
+      <div class="h">Before &middot; Weekend Block</div>
+      <div class="days">
+        <div class="day">Mo</div><div class="day">Tu</div><div class="day">We</div><div class="day">Th</div>
+        <div class="day lock">Fr</div><div class="day lock">Sa</div><div class="day lock">Su</div>
+      </div>
+    </div>
+    <div class="daygrid good">
+      <div class="h">After &middot; Sunday Split</div>
+      <div class="days">
+        <div class="day">Mo</div><div class="day">Tu</div><div class="day">We</div><div class="day">Th</div>
+        <div class="day split">Fr</div><div class="day split">Sa</div><div class="day">Su</div>
+      </div>
+    </div>
+  </div>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>Sunday locked into a Fri-Sat MinStay-2 = zero 1-night arrivals.</div></div>
+    <div class="b teal"><div class="dot"></div><div>Fix: split Sunday into its own season, MinStay 1.</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Price 70 to 85% of the weekend rate. New segment, no weekend cut.</div></div>
+  </div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">10 / 20</span></div>
+</section>
+
+<!-- SLIDE 11 - F7: BLACKOUT STRATEGY -->
+<section class="slide" data-slide="11">
+  <div class="eyebrow">Framework 07 &middot; Blackouts</div>
+  <h2>Blackout Strategy</h2>
+  <div class="preset-pair">
+    <div class="preset">
+      <div class="lbl">Peak</div>
+      <div class="num">~ 59 nights</div>
+      <div class="desc">Summer holidays + Christmas only.</div>
+    </div>
+    <div class="preset teal">
+      <div class="lbl">Peak + High</div>
+      <div class="num">~ 96 nights</div>
+      <div class="desc">Adds bridge-holiday weeks and shoulder season.</div>
+    </div>
+  </div>
+  <div class="warn" style="border-color:var(--yellow);margin-top:1rem">
+    <div class="h" style="color:var(--yellow)">Both presets leak at non-obvious holidays.</div>
+    <div class="s">Pentecost and Corpus Christi sit in the gaps. Discounts fire there unless capped.</div>
+  </div>
+  <div class="punch">Toggle blackouts BEFORE you cut prices.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">11 / 20</span></div>
+</section>
+
+<!-- SLIDE 12 - F8: LEVER HIERARCHY -->
+<section class="slide" data-slide="12">
+  <div class="eyebrow">Framework 08 &middot; Hierarchy</div>
+  <h2>Lever Hierarchy under Demand Softness</h2>
+  <div class="levers">
+    <div class="lever"><div class="n">1</div><div><h4>Reduce blackout coverage (96N to 59N)</h4><p>Expands available inventory at a controlled discount tier.</p></div></div>
+    <div class="lever teal"><div class="n">2</div><div><h4>Reduce MinStay (2 to 1)</h4><p>Activates a new arrival segment without touching base price.</p></div></div>
+    <div class="lever red"><div class="n">3</div><div><h4>Cut base price (last resort)</h4><p>Direct margin hit. Use only after lever 1 and 2 are exhausted.</p></div></div>
+  </div>
+  <div class="punch">Lever 1 + 2 expand inventory. Lever 3 shrinks margin.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">12 / 20</span></div>
+</section>
+
+<!-- SLIDE 13 - PIPELINE 1: APOLLO CACHE -->
+<section class="slide" data-slide="13">
+  <div class="eyebrow">Live Pipeline &middot; Part 01</div>
+  <h2>Apollo Cache Extraction</h2>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>OTA backend = GraphQL behind a logged-in PMS-Web.</div></div>
+    <div class="b teal"><div class="dot"></div><div>Bearer-token captured via a fetch-interceptor in the browser console.</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Schema discovered via error-pattern probing. Introspection is disabled.</div></div>
+    <div class="b purple"><div class="dot"></div><div>Output: full inventory of seasons, discounts, blackouts.</div></div>
+  </div>
+  <div class="code">const orig = window.fetch;<br>window.fetch = (...a) =&gt; { console.log(a[1].headers.authorization); return orig(...a); };</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">13 / 20</span></div>
+</section>
+
+<!-- SLIDE 14 - PIPELINE 2: MUTATIONS -->
+<section class="slide" data-slide="14">
+  <div class="eyebrow">Live Pipeline &middot; Part 02</div>
+  <h2>GraphQL Mutations at Scale</h2>
+  <div class="mut-grid">
+    <div class="mut"><div class="name">UpsertUnitTypeSeason</div><div class="d">Create or update a season window.</div></div>
+    <div class="mut teal"><div class="name">DeleteUnitTypeSeason</div><div class="d">Remove a season cleanly.</div></div>
+    <div class="mut yellow"><div class="name">UpsertUnitTypeDiscount</div><div class="d">Toggle discount tier and preset.</div></div>
+  </div>
+  <div class="stat-grid" style="margin-top:1rem">
+    <div class="stat"><div class="big">~720</div><div class="sub">mutations per full rebuild</div><div class="cap">6 studios x 120 calls</div></div>
+    <div class="stat teal"><div class="big">~2 min</div><div class="sub">wall-clock for one batch</div><div class="cap">Idempotent by design</div></div>
+  </div>
+  <div class="punch" style="color:var(--muted);font-weight:500">Constraint: API only accepts preset types (PEAK, PEAK_AND_HIGH).</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">14 / 20</span></div>
+</section>
+
+<!-- SLIDE 15 - PIPELINE 3: CHANGE-LOG -->
+<section class="slide" data-slide="15">
+  <div class="eyebrow">Live Pipeline &middot; Part 03</div>
+  <h2>Change-Log + Recheck Cadence</h2>
+  <div class="bullets">
+    <div class="b"><div class="dot"></div><div>Every tuning logged: before / after, occupancy snapshot, cluster overview.</div></div>
+    <div class="b teal"><div class="dot"></div><div>48 to 72-hour velocity post-mortem: did the lever fire?</div></div>
+    <div class="b yellow"><div class="dot"></div><div>Memory files compound into a personal pricing playbook.</div></div>
+    <div class="b purple"><div class="dot"></div><div>Outcome: institutional memory survives every restart.</div></div>
+  </div>
+  <div class="quote">The discipline matters more than the tool. Notion, a Google Sheet, a markdown file: pick one and write.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">15 / 20</span></div>
+</section>
+
+<!-- SLIDE 16 - CASE 1 -->
+<section class="slide" data-slide="16">
+  <div class="eyebrow">Case Study 01 &middot; Structure</div>
+  <h2>Q2 Season Rebuild</h2>
+  <div class="case-rows">
+    <div class="case-row purple"><div class="k">Trigger</div><div class="v">Q2 ramp into peak season. Default presets misaligned with demand.</div></div>
+    <div class="case-row"><div class="k">Action</div><div class="v">6 apartments x 56 seasons restructured. Blackouts trimmed.</div></div>
+    <div class="case-row teal"><div class="k">Result</div><div class="v">+9 bookings in 48 hours. Ranking lift propagated across all units.</div></div>
+    <div class="case-row lesson"><div class="k">Lesson</div><div class="v">Macro restructures beat micro price tweaks.</div></div>
+  </div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">16 / 20</span></div>
+</section>
+
+<!-- SLIDE 17 - CASE 2 -->
+<section class="slide" data-slide="17">
+  <div class="eyebrow">Case Study 02 &middot; Leak</div>
+  <h2>The 47% Leak</h2>
+  <div class="case-rows">
+    <div class="case-row" style="border-color:var(--red)"><div class="k" style="color:var(--red)">Trigger</div><div class="v">One 18-night booking at peak with all four discounts firing.</div></div>
+    <div class="case-row"><div class="k">Action</div><div class="v">Weekly tier reduced from 20% to 10%. Max stack now 0.9 ^ 4 = 34%.</div></div>
+    <div class="case-row teal"><div class="k">Result</div><div class="v">Same-shape incident impossible going forward. Velocity preserved.</div></div>
+    <div class="case-row lesson"><div class="k">Lesson</div><div class="v">Preset gaps are non-obvious leak vectors.</div></div>
+  </div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">17 / 20</span></div>
+</section>
+
+<!-- SLIDE 18 - CASE 3 -->
+<section class="slide" data-slide="18">
+  <div class="eyebrow">Case Study 03 &middot; Segment</div>
+  <h2>Sunday-Split Activation</h2>
+  <div class="case-rows">
+    <div class="case-row teal"><div class="k">Trigger</div><div class="v">0% Sunday occupancy under a Fri-Sat MinStay-2 weekend block.</div></div>
+    <div class="case-row"><div class="k">Action</div><div class="v">5 Sundays unbundled (30 deletes + 60 creates via API).</div></div>
+    <div class="case-row yellow"><div class="k">Result</div><div class="v">1-night Sunday segment activated. No weekend rate cut.</div></div>
+    <div class="case-row lesson"><div class="k">Lesson</div><div class="v">Structure beats price in segment activation.</div></div>
+  </div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">18 / 20</span></div>
+</section>
+
+<!-- SLIDE 19 - PLAYBOOK -->
+<section class="slide" data-slide="19">
+  <div class="eyebrow">Meta Lesson</div>
+  <h2>The AI-First Operator Playbook</h2>
+  <div class="playbook">
+    <div class="pb"><div class="n">01</div><div class="lbl">Data</div><div class="d">Apollo cache + competitor calendar.</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="pb teal"><div class="n">02</div><div class="lbl">Frameworks</div><div class="d">8 levers, 1 hierarchy.</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="pb yellow"><div class="n">03</div><div class="lbl">Mutations</div><div class="d">GraphQL batch via API.</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="pb purple"><div class="n">04</div><div class="lbl">Recheck</div><div class="d">48-72h velocity post-mortem.</div></div>
+  </div>
+  <div class="punch" style="margin-top:1.6rem;font-size:1.25rem">The pattern is domain-agnostic.</div>
+  <div class="lede">Replicable to short-let, ecom pricing, ad budgets, ticket inventory, SaaS metering. Required: API access, cache extraction, change-log discipline.</div>
+  <div class="slide-footer"><span>Erler Ventures &middot; Pricing Maximization</span><span class="page-no">19 / 20</span></div>
+</section>
+
+<!-- SLIDE 20 - CONTACT -->
+<section class="slide" data-slide="20">
+  <div class="title-eyebrow">Erler Ventures</div>
+  <div class="close-h1">Let&rsquo;s talk.</div>
+  <div class="close-line"></div>
+  <div class="close-name">Chris Erler</div>
+  <a class="close-mail" href="mailto:chris@erlerventures.org">chris@erlerventures.org</a>
+  <div class="close-cal"><a href="https://calendly.com/chris-gdvo/30min" style="color:var(--muted);text-decoration:none">calendly.com/chris-gdvo/30min</a></div>
+  <div class="close-tag">Operator-first &middot; Code-first &middot; Margin-first</div>
+  <div class="slide-footer"><span>Pricing Maximization &middot; Cape Town Exchange 2026</span><span class="page-no">20 / 20</span></div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&lsaquo;</button>
+  <button id="next" aria-label="Next slide">&rsaquo;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  function show(i) {
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    if (history.replaceState) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  function init() {
+    const hash = parseInt((location.hash || '').replace('#', ''), 10);
+    if (!isNaN(hash) && hash >= 1 && hash <= slides.length) show(hash - 1);
+  }
+  document.getElementById('prev').onclick = () => show(idx - 1);
+  document.getElementById('next').onclick = () => show(idx + 1);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(idx + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+    if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.();
+  });
+  let tx = 0;
+  document.addEventListener('touchstart', (e) => tx = e.touches[0].clientX);
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (dx < -50) show(idx + 1);
+    if (dx > 50) show(idx - 1);
+  });
+  init();
+</script>
+</body>
+</html>
