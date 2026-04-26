@@ -18,6 +18,7 @@ Restart Claude Code. The skill loads when the description matches your prompt.
 |---|---|---|
 | [example-pricing-coach](example-pricing-coach/SKILL.md) | B2B SaaS pricing strategy | Chris (template) |
 | [anti-ai-voice](anti-ai-voice/SKILL.md) | Strip AI-tells from external-facing copy (sales emails, LinkedIn, landing pages) | Chris |
+| [vacation-rental-pricing-coach](vacation-rental-pricing-coach/SKILL.md) | OTA pricing for small vacation-rental portfolios (Holidu, Booking, Airbnb) | Chris |
 
 ## Add yours
 
