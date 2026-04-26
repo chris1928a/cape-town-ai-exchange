@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Portfolio · Cape Town Exchange · Christoph Erler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #06090f;
+    --bg-2: #0C1727;
+    --text: #F8FAFC;
+    --muted: #8499b5;
+    --muted-deep: #5b6d87;
+    --cyan: #00C8FF;
+    --cyan-soft: rgba(0, 200, 255, 0.12);
+    --line: rgba(255, 255, 255, 0.10);
+    --card: rgba(255, 255, 255, 0.035);
+    --card-border: rgba(255, 255, 255, 0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg-1);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background:
+      radial-gradient(ellipse at 82% 18%, rgba(0, 200, 255, 0.20) 0%, transparent 48%),
+      radial-gradient(ellipse at 12% 88%, rgba(168, 140, 255, 0.08) 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+    background-size: 6vw 6vw;
+    mask-image: radial-gradient(ellipse at center, black 38%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 38%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 7vh 8vw 10vh 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    z-index: 2;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Brand bar (every slide) */
+  .brand {
+    position: absolute;
+    top: 4vh;
+    left: 8vw;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .brand-dot {
+    width: 11px; height: 11px;
+    background: var(--cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.75);
+  }
+  .brand-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Footer (every slide) */
+  .foot {
+    position: absolute;
+    left: 8vw; right: 8vw;
+    bottom: 3.5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-deep);
+  }
+  .page-no { color: var(--cyan); }
+
+  /* Type */
+  .eyebrow {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.6rem;
+  }
+  h1 {
+    font-size: clamp(3.5rem, 7.4vw, 7rem);
+    font-weight: 800;
+    line-height: 0.97;
+    letter-spacing: -0.035em;
+    color: var(--text);
+  }
+  h2 {
+    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    margin-bottom: 2.2rem;
+  }
+  h2 .accent { color: var(--cyan); }
+  .lede {
+    font-size: clamp(1.1rem, 1.55vw, 1.5rem);
+    color: var(--muted);
+    max-width: 70ch;
+    line-height: 1.5;
+    margin-top: 1.4rem;
+  }
+  .kicker {
+    font-size: clamp(1.2rem, 1.8vw, 1.7rem);
+    color: var(--cyan);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    max-width: 78ch;
+  }
+
+  /* Cover */
+  .cover-sub {
+    font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+    font-weight: 500;
+    color: var(--cyan);
+    letter-spacing: -0.01em;
+    margin-top: 1.4rem;
+  }
+  .cover-meta {
+    margin-top: 4vh;
+    padding-top: 2.4rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 6vw;
+  }
+  .cover-meta .item-role {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 0.7rem;
+  }
+  .cover-meta .item-name {
+    font-size: clamp(1.2rem, 1.6vw, 1.6rem);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  /* Stat rows */
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(2rem, 4vw, 5rem);
+    margin-top: 2.6rem;
+  }
+  .stat { display: flex; flex-direction: column; gap: 0.35rem; max-width: 22ch; }
+  .stat-num {
+    font-size: clamp(2.6rem, 4.4vw, 4rem);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -0.025em;
+  }
+  .stat-num.cyan { color: var(--cyan); }
+  .stat-label {
+    font-size: clamp(0.85rem, 1.05vw, 1rem);
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .stat-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+
+  /* Cards (pillars / properties) */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.2rem, 2vw, 2.2rem);
+    margin-top: 1.4rem;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(1rem, 1.6vw, 1.8rem);
+    margin-top: 1.4rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: clamp(1.4rem, 2vw, 2.2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .card-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .card-title {
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+  .card-body {
+    font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .card-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+    color: var(--text);
+    line-height: 1.45;
+  }
+  .card-list li::before {
+    content: "›";
+    color: var(--cyan);
+    margin-right: 0.7rem;
+    font-weight: 700;
+  }
+
+  /* Bullet list (returns mechanics) */
+  .bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-top: 1.6rem;
+    max-width: 80ch;
+  }
+  .bullets li {
+    font-size: clamp(1.05rem, 1.4vw, 1.4rem);
+    color: var(--text);
+    line-height: 1.42;
+    padding-left: 2.2rem;
+    position: relative;
+  }
+  .bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 1.2rem;
+    height: 1px;
+    background: var(--cyan);
+  }
+  .bullets li b { color: var(--cyan); font-weight: 600; }
+
+  /* Closing card */
+  .closing {
+    margin-top: 2.6rem;
+    padding: 2rem 2.4rem;
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 60ch;
+  }
+  .closing .label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .closing .name {
+    font-size: clamp(1.3rem, 1.8vw, 1.7rem);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .closing .line { font-size: 1rem; color: var(--muted); }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 2vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 50;
+    opacity: 0.35;
+    transition: opacity 0.2s;
+  }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav button:hover { background: var(--cyan-soft); }
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="grid"></div>
+
+  <!-- 1. COVER -->
+  <section class="slide active" data-no="01">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <h1>Real Estate<br>Portfolio</h1>
+    <div class="cover-sub">Two pillars, one rent-driven thesis.</div>
+    <div class="cover-meta">
+      <div>
+        <div class="item-role">Speaker</div>
+        <div class="item-name">Christoph Erler</div>
+      </div>
+      <div>
+        <div class="item-role">Vehicle</div>
+        <div class="item-name">Erler Ventures</div>
+      </div>
+      <div>
+        <div class="item-role">Region</div>
+        <div class="item-name">Bavaria, Germany</div>
+      </div>
+    </div>
+    <div class="foot"><span>Real Estate Portfolio</span><span class="page-no">01 / 11</span></div>
+  </section>
+
+  <!-- 2. THESIS -->
+  <section class="slide" data-no="02">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Investment Thesis</div>
+    <h2>Two pillars, <span class="accent">one thesis.</span></h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-tag">Pillar 1</div>
+        <div class="card-title">State-backed care leases</div>
+        <div class="card-body">Multi-decade leases to a licensed German care operator. Rent is paid out of the public social-security framework and re-indexed every 24 months.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">Pillar 2</div>
+        <div class="card-title">Legoland tourism apartments</div>
+        <div class="card-body">Short-stay studios and vacation homes within a 15-minute radius of Legoland Germany, priced dynamically through Holidu and Booking.com.</div>
+      </div>
+    </div>
+    <div class="kicker" style="margin-top:2.4rem;">30-year public-tenant security paired with high-velocity tourism upside, all clustered around one anchor.</div>
+    <div class="foot"><span>The Thesis</span><span class="page-no">02 / 11</span></div>
+  </section>
+
+  <!-- 3. WHY GÜNZBURG -->
+  <section class="slide" data-no="03">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Location</div>
+    <h2>Why Günzburg, <span class="accent">Bavaria.</span></h2>
+    <div class="lede">A small city in southern Germany on the industrial corridor between Stuttgart, Munich, and Ulm. The portfolio sits inside a single 15-minute driving radius around one anchor.</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num cyan">1M+</div>
+        <div class="stat-label">Visitors per year to Legoland Germany</div>
+        <div class="stat-tag">Tourism anchor</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">15 min</div>
+        <div class="stat-label">Driving radius covering the entire portfolio</div>
+        <div class="stat-tag">Operational density</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1 hr</div>
+        <div class="stat-label">Reach to Stuttgart, Munich, and Ulm</div>
+        <div class="stat-tag">Catchment</div>
+      </div>
+    </div>
+    <div class="foot"><span>Why Günzburg</span><span class="page-no">03 / 11</span></div>
+  </section>
+
+  <!-- 4. PORTFOLIO AT A GLANCE -->
+  <section class="slide" data-no="04">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Portfolio</div>
+    <h2>What we built. <span class="accent">What's next.</span></h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-num cyan">7</div><div class="stat-label">Properties</div></div>
+      <div class="stat"><div class="stat-num cyan">5</div><div class="stat-label">Holdings</div></div>
+      <div class="stat"><div class="stat-num cyan">42</div><div class="stat-label">Units operating</div></div>
+      <div class="stat"><div class="stat-num cyan">24</div><div class="stat-label">Units in build</div></div>
+      <div class="stat"><div class="stat-num cyan">2</div><div class="stat-label">Asset classes</div></div>
+    </div>
+    <div class="lede" style="margin-top:3rem;">A stabilised base of operating assets, plus a near-term pipeline that compounds onto the same operator stack and the same Legoland catchment.</div>
+    <div class="foot"><span>Portfolio</span><span class="page-no">04 / 11</span></div>
+  </section>
+
+  <!-- 5. PILLAR 1 · CARE FACILITIES -->
+  <section class="slide" data-no="05">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Pillar 1</div>
+    <h2>Care facilities.</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-tag">Hölderlin · Günzburg</div>
+        <div class="card-title">Children's care home</div>
+        <ul class="card-list">
+          <li>1,179 m² across two buildings</li>
+          <li>Single tenant, fully leased</li>
+          <li>30-year lease tenor</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-tag">Reisensburg · Günzburg</div>
+        <div class="card-title">Nursing home</div>
+        <ul class="card-list">
+          <li>Care facility, fully leased</li>
+          <li>Single tenant, same operator</li>
+          <li>Lease runs through 2051</li>
+        </ul>
+      </div>
+    </div>
+    <div class="kicker" style="margin-top:2.4rem;">Both assets carry the same operator. One tenant, two buildings, one playbook.</div>
+    <div class="foot"><span>Pillar 1 · Care</span><span class="page-no">05 / 11</span></div>
+  </section>
+
+  <!-- 6. HOW A CARE LEASE PAYS -->
+  <section class="slide" data-no="06">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Returns Mechanics · Care</div>
+    <h2>How a 30-year lease <span class="accent">pays.</span></h2>
+    <ul class="bullets">
+      <li><b>Tenant.</b> Seitz gGmbH, a licensed German care operator running both facilities under one master agreement.</li>
+      <li><b>Source of rent.</b> The German social-security framework (SGB II / XII). Public funds, statutorily backed, recession-insulated.</li>
+      <li><b>Tenor.</b> 30 years on Hölderlin, lease running through 2051 on Reisensburg. Holding the asset means holding the contract.</li>
+      <li><b>Indexation.</b> Rent re-sets every 24 months against inflation. The contract carries the inflation hedge, not the operator.</li>
+      <li><b>Vacancy risk.</b> Zero on the asset. The operator can rotate occupants. We rent the building to the operator, full stop.</li>
+    </ul>
+    <div class="foot"><span>Returns · Care</span><span class="page-no">06 / 11</span></div>
+  </section>
+
+  <!-- 7. PILLAR 2 · LEGOLAND APARTMENTS -->
+  <section class="slide" data-no="07">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Pillar 2</div>
+    <h2>Legoland apartments.</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-tag">Deffingen · 8 min from Legoland</div>
+        <div class="card-title">Parkside Studios</div>
+        <ul class="card-list">
+          <li>6 studios, single building</li>
+          <li>Operator: Parkside Apartments</li>
+          <li>Channels: Holidu, Booking.com</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-tag">Knöringen · 15 min from Legoland</div>
+        <div class="card-title">Vacation homes &amp; apartments</div>
+        <ul class="card-list">
+          <li>8 vacation homes</li>
+          <li>2 long-stay apartments</li>
+          <li>Same operator stack</li>
+        </ul>
+      </div>
+    </div>
+    <div class="kicker" style="margin-top:2.4rem;">One operator, one channel mix, one demand engine. Legoland sits at the centre of the catchment.</div>
+    <div class="foot"><span>Pillar 2 · Tourism</span><span class="page-no">07 / 11</span></div>
+  </section>
+
+  <!-- 8. HOW A TOURISM APARTMENT PAYS -->
+  <section class="slide" data-no="08">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Returns Mechanics · Tourism</div>
+    <h2>How a tourism apartment <span class="accent">pays.</span></h2>
+    <ul class="bullets">
+      <li><b>Dynamic daily pricing.</b> Each night is priced against a live local benchmark set, refreshed continuously.</li>
+      <li><b>Min-stay logic.</b> Sunday-split rules unlock single-night gaps without breaking weekly cadence.</li>
+      <li><b>Discount stacking.</b> Mobile, early-bird, and weekly discounts are layered to capture the right segment without giving rate away.</li>
+      <li><b>Peak uplift.</b> May through September carries the season. Ferien clusters and event weekends are priced as their own micro-seasons.</li>
+      <li><b>Booking velocity.</b> A faster booking pace lifts ranking on Booking.com, which compounds into more organic bookings. The pricing engine optimises for that loop, not just for nightly rate.</li>
+    </ul>
+    <div class="foot"><span>Returns · Tourism</span><span class="page-no">08 / 11</span></div>
+  </section>
+
+  <!-- 9. PIPELINE -->
+  <section class="slide" data-no="09">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Pipeline</div>
+    <h2>The next <span class="accent">24 units.</span></h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-tag">Knöringen · Under construction</div>
+        <div class="card-title">22 new serviced studios</div>
+        <div class="card-body">A purpose-built serviced-apartment block extending the same Legoland-tourism pillar onto a single site. Operator stack and pricing playbook are already proven on the operating units next door.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">Burgau · Under construction</div>
+        <div class="card-title">2-unit single-family build</div>
+        <div class="card-body">A small infill build, two units inside the same 15-minute radius. Built once, leased on the same operator template.</div>
+      </div>
+    </div>
+    <div class="kicker" style="margin-top:2.4rem;">Same thesis. Same operator. Same catchment. The pipeline adds units, not complexity.</div>
+    <div class="foot"><span>Pipeline</span><span class="page-no">09 / 11</span></div>
+  </section>
+
+  <!-- 10. COMBINED RETURNS ENGINE -->
+  <section class="slide" data-no="10">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Returns Engine</div>
+    <h2>Floor, upside, <span class="accent">compounding.</span></h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-tag">Floor</div>
+        <div class="card-title">Care leases</div>
+        <div class="card-body">Indexed cash flow. 30-year horizon. Public source of rent. Vacancy risk lives with the operator.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">Upside</div>
+        <div class="card-title">Tourism apartments</div>
+        <div class="card-body">Dynamic occupancy and ADR. Booking-velocity loop. Seasonal uplift inside a fixed catchment.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">Compounding</div>
+        <div class="card-title">Build pipeline</div>
+        <div class="card-body">New units onto a proven operator and a proven catchment. Same playbook, more inventory.</div>
+      </div>
+    </div>
+    <div class="kicker" style="margin-top:2.4rem;">All three legs are rooted in real rental contracts. No financial engineering, no model assumptions doing the lifting.</div>
+    <div class="foot"><span>Returns Engine</span><span class="page-no">10 / 11</span></div>
+  </section>
+
+  <!-- 11. CLOSING -->
+  <section class="slide" data-no="11">
+    <div class="brand"><div class="brand-dot"></div><div class="brand-label">Cape Town Exchange · 2026</div></div>
+    <div class="eyebrow">Holding &amp; Exit</div>
+    <h2>Built around <span class="accent">real rent.</span></h2>
+    <ul class="bullets">
+      <li><b>Hold horizon.</b> 10 years per asset, with refinance or exit decided per holding, not per portfolio.</li>
+      <li><b>Diversification.</b> Across tenant duration (long-term care, short-stay tourism) and across tenant type (state-backed, private guest).</li>
+      <li><b>Leverage.</b> Conservative. The contracts carry the cash flow, not the leverage stack.</li>
+    </ul>
+    <div class="closing">
+      <div class="label">Continue the conversation</div>
+      <div class="name">Christoph Erler · Erler Ventures</div>
+      <div class="line">chris@erlerventures.org</div>
+      <div class="line">calendly.com/chris-gdvo/30min</div>
+    </div>
+    <div class="foot"><span>Closing</span><span class="page-no">11 / 11</span></div>
+  </section>
+
+  <div class="nav">
+    <button onclick="go(-1)" aria-label="Previous">‹</button>
+    <button onclick="go(1)" aria-label="Next">›</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let i = 0;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  }
+  function go(d) { show(i + d); }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+    else if (e.key === 'Home') { e.preventDefault(); show(0); }
+    else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1); }
+  });
+</script>
+</body>
+</html>

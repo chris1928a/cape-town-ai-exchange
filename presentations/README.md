@@ -5,6 +5,7 @@ Talks given at the Cape Town AI Exchange. Each talk is a self-contained HTML dec
 | Talk | Speaker | Year |
 |---|---|---|
 | [Pricing Maximization](pricing-maximization/) | Chris Erler | 2026 |
+| [Real Estate Portfolio](real-estate-portfolio/) | Chris Erler | 2026 |
 
 ## Structure
 
