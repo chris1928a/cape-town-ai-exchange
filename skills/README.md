@@ -17,6 +17,7 @@ Restart Claude Code. The skill loads when the description matches your prompt.
 | Skill | Domain | Author |
 |---|---|---|
 | [example-pricing-coach](example-pricing-coach/SKILL.md) | B2B SaaS pricing strategy | Chris (template) |
+| [invoice-accountant](invoice-accountant/SKILL.md) | Inbound invoice automation: Gmail forward + Chrome-MCP portal scraper + Google Sheet tracker | Chris |
 
 ## Add yours
 

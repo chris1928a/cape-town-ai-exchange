@@ -18,6 +18,7 @@ If you build something interesting, open a PR and add it here. The point is to c
 |---|---|---|---|
 | **[Erler Brain](quickstarts/erler-brain.md)** | Personal AI Assistant on Telegram + WhatsApp + Google Workspace | ~30 min | ~5 EUR/month |
 | **[Sales Leadership Board](quickstarts/sales-board.md)** | Turn CRM call data into individualized SDR coaching | ~1 hour | ~15 EUR/month |
+| **[Invoice Automation Pipeline](quickstarts/invoice-automation.md)** | 3-tier inbound-invoice routing: Gmail filters + Chrome MCP + Google Sheet tracker | ~1 working day | free |
 | **[Build your own Claude Code Skill](quickstarts/claude-skills.md)** | Encode your domain expertise as a reusable Claude skill | ~20 min | free |
 
 ---
@@ -39,7 +40,10 @@ Tells each rep what to practice this week. ~15 EUR/month vs. Gong at 9,300 EUR/y
 The [`skills/`](skills/) folder is a community library of reusable Claude Code Skills.
 Drop one into your `~/.claude/skills/` and it loads automatically when relevant.
 
-Currently shipping: [example-pricing-coach](skills/example-pricing-coach/SKILL.md) (template).
+Currently shipping:
+- [example-pricing-coach](skills/example-pricing-coach/SKILL.md) — B2B SaaS pricing strategist (template)
+- [invoice-accountant](skills/invoice-accountant/SKILL.md) — Inbound invoice automation: Gmail-forward + portal scraper + tracker sheet
+
 Add yours via PR — see [skills/README.md](skills/README.md).
 
 ---
