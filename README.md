@@ -34,22 +34,30 @@ Tells each rep what to practice this week. ~15 EUR/month vs. Gong at 9,300 EUR/y
 
 ---
 
-## Bring your own
+## Shared Claude Code Skills
 
-The Cape Town crew is small but builds in public. If you have a tool worth sharing:
+The [`skills/`](skills/) folder is a community library of reusable Claude Code Skills.
+Drop one into your `~/.claude/skills/` and it loads automatically when relevant.
 
-1. Fork this repo
-2. Add a quickstart in `quickstarts/your-tool.md` (use `quickstarts/erler-brain.md` as a template)
-3. Add a row in the table above
-4. Open a PR
-
-We aim for: under-30-minute deploy, under-100-EUR/month cost, sanitized of any client data, MIT license.
+Currently shipping: [example-pricing-coach](skills/example-pricing-coach/SKILL.md) (template).
+Add yours via PR — see [skills/README.md](skills/README.md).
 
 ---
 
 ## Meetup notes
 
-Notes from past sessions live in `meetup-notes/`. Add yours after each session — it helps people who could not make it stay in the loop.
+Notes from past sessions live in [`meetup-notes/`](meetup-notes/).
+Template: [meetup-notes/README.md](meetup-notes/README.md). Add yours after each session.
+
+---
+
+## Contributing
+
+How to add quickstarts, skills, or meetup notes: [CONTRIBUTING.md](CONTRIBUTING.md).
+Community norms: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+The bar is intentionally low: under-30-minute deploy, under-100-EUR/month cost,
+sanitized of any client data, MIT or similar license.
 
 ---
 
