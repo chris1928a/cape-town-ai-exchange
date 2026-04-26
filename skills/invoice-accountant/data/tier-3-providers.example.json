@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "description": "Contract-based payments — once-set-up, then reference only. No monthly action needed.",
+    "schema_version": "1.0"
+  },
+  "providers": [
+    {
+      "id": "office-rent",
+      "name": "Office Rent (placeholder)",
+      "category": "Rent",
+      "contract_ref": "Lease agreement, monthly direct debit",
+      "datev_handling": "Standing order, bank statement is sufficient"
+    },
+    {
+      "id": "managing-director-salary",
+      "name": "Managing Director Salary (placeholder)",
+      "category": "Payroll",
+      "contract_ref": "Employment / managing director contract",
+      "datev_handling": "Internal payroll booking, no invoice needed"
+    },
+    {
+      "id": "tax-authority",
+      "name": "Tax Authority (placeholder)",
+      "category": "Statutory",
+      "contract_ref": "n/a",
+      "datev_handling": "Decisions arrive by post or in tax-authority mailbox; scan and forward",
+      "annual_action": false,
+      "notes": "Some authorities now have an electronic mailbox — check before defaulting to paper post."
+    },
+    {
+      "id": "chamber-of-commerce",
+      "name": "Chamber of Commerce (placeholder)",
+      "category": "Statutory membership",
+      "contract_ref": "Mandatory membership",
+      "datev_handling": "Annual invoice by post or email — scan once a year",
+      "annual_action": true
+    },
+    {
+      "id": "life-insurance-policy",
+      "name": "Life Insurance Policy (placeholder)",
+      "category": "Insurance",
+      "contract_ref": "Policy number XXX-YYYY",
+      "datev_handling": "Policy document arrives once a year — scan + forward",
+      "annual_action": true
+    },
+    {
+      "id": "tax-advisor",
+      "name": "Tax Advisor (placeholder)",
+      "category": "Professional services",
+      "contract_ref": "Engagement letter / mandate",
+      "datev_handling": "Tax advisor sends invoices directly to the accounting system — already handled"
+    },
+    {
+      "id": "fuel-stations-photo",
+      "name": "Fuel Stations (Total/Shell/etc.)",
+      "category": "Fuel",
+      "contract_ref": "Card payments",
+      "datev_handling": "Photograph paper receipt → run images_to_pdf.py → forward to accountant",
+      "manual_photo_required": true
+    }
+  ]
+}

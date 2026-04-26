@@ -1,0 +1,124 @@
+{
+  "_meta": {
+    "description": "Tier-2 portal recipes — click-paths Claude-in-Chrome MCP walks each month to download PDF invoices.",
+    "schema_version": "1.0",
+    "accountant_email_placeholder": "<your-accountant-inbox>",
+    "download_dir": "~/Downloads/Invoices/{provider_id}/{YYYY-MM}.pdf"
+  },
+  "recipes": {
+    "openai-platform": {
+      "name": "OpenAI Platform/API",
+      "category": "AI/SaaS",
+      "cycle": "monthly",
+      "url": "https://platform.openai.com/account/billing/history",
+      "login_required": true,
+      "login_method": "Email + Password + 2FA",
+      "trust_device_supported": true,
+      "steps": [
+        {"action": "navigate", "url": "https://platform.openai.com/account/billing/history"},
+        {"action": "wait_for", "selector": "table, [role='table']"},
+        {"action": "for_each", "selector": "tr[data-row], .invoice-row", "do": [
+          {"action": "click_and_download_pdf", "selector_within": "a:contains('Download'), button:contains('Download')"}
+        ]}
+      ],
+      "datev_subject_template": "OpenAI API {month}/{year}",
+      "fallback_behavior": "tier3_human_ping"
+    },
+    "anthropic-console": {
+      "name": "Anthropic Console",
+      "category": "AI/SaaS",
+      "cycle": "monthly",
+      "url": "https://console.anthropic.com/settings/billing",
+      "login_required": true,
+      "login_method": "Email + Password + 2FA",
+      "trust_device_supported": true,
+      "steps": [
+        {"action": "navigate", "url": "https://console.anthropic.com/settings/billing"},
+        {"action": "wait_for", "selector": "[data-testid='invoice-history'], .invoices"},
+        {"action": "for_each", "selector": ".invoice-row a[href*='invoice']", "do": [
+          {"action": "click_and_download_pdf"}
+        ]}
+      ],
+      "datev_subject_template": "Anthropic Console {month}/{year}",
+      "fallback_behavior": "tier3_human_ping",
+      "notes": "Many users get Anthropic receipts via Stripe email automatically — try Tier 1 first."
+    },
+    "uber-business": {
+      "name": "Uber Business",
+      "category": "Mobility",
+      "cycle": "monthly",
+      "url": "https://riders.uber.com/trips",
+      "login_required": true,
+      "login_method": "Email + SMS code",
+      "trust_device_supported": true,
+      "steps": [
+        {"action": "navigate", "url": "https://riders.uber.com/trips"},
+        {"action": "wait_for", "selector": "[data-testid='trip-list'], .trip-list"},
+        {"action": "filter_period", "value": "last_month"},
+        {"action": "for_each", "selector": ".trip-row, [data-testid='trip-item']", "do": [
+          {"action": "click_and_download_pdf", "selector_within": ".receipt-button, [aria-label*='Receipt']"}
+        ]},
+        {"action": "merge_pdfs", "to": "uber_{YYYY-MM}.pdf"}
+      ],
+      "datev_subject_template": "Uber Business {month}/{year}",
+      "fallback_behavior": "tier3_human_ping"
+    },
+    "apple-reportaproblem": {
+      "name": "Apple (App Store / iCloud)",
+      "category": "SaaS",
+      "cycle": "irregular",
+      "url": "https://reportaproblem.apple.com/",
+      "login_required": true,
+      "login_method": "Apple ID + 2FA",
+      "trust_device_supported": false,
+      "steps": [
+        {"action": "navigate", "url": "https://reportaproblem.apple.com/"},
+        {"action": "wait_for", "selector": ".purchases-list"},
+        {"action": "for_each", "selector": ".purchase-row", "do": [
+          {"action": "click_and_download_pdf_or_screenshot", "selector_within": "button:contains('Receipt')"}
+        ]}
+      ],
+      "datev_subject_template": "Apple {item} {date}",
+      "fallback_behavior": "tier3_human_ping",
+      "notes": "Apple often emails receipts too — keep Tier 1 filter for from:no_reply@apple.com as primary."
+    },
+    "aws-billing-console": {
+      "name": "AWS Billing Console (PDF invoices)",
+      "category": "Cloud/Infrastructure",
+      "cycle": "monthly",
+      "url": "https://console.aws.amazon.com/billing/home#/bills",
+      "login_required": true,
+      "login_method": "AWS Root or IAM + MFA",
+      "trust_device_supported": false,
+      "steps": [
+        {"action": "navigate", "url": "https://console.aws.amazon.com/billing/home#/bills"},
+        {"action": "wait_for", "selector": "[data-testid='bill-list']"},
+        {"action": "select_period", "value": "last_month"},
+        {"action": "click", "selector": "a:contains('Download CSV'), a:contains('Download PDF')"},
+        {"action": "download_pdf"}
+      ],
+      "datev_subject_template": "AWS {month}/{year}",
+      "fallback_behavior": "tier3_human_ping",
+      "notes": "AWS root account login enforces MFA every session — usually Tier 3 unless you have a dedicated billing IAM user with trust-device."
+    },
+    "stripe-self-billing": {
+      "name": "Stripe (self-hosted dashboard for your own Stripe account)",
+      "category": "Payment Processor",
+      "cycle": "monthly",
+      "url": "https://dashboard.stripe.com/invoices",
+      "login_required": true,
+      "login_method": "Email + Password + 2FA",
+      "trust_device_supported": true,
+      "steps": [
+        {"action": "navigate", "url": "https://dashboard.stripe.com/invoices"},
+        {"action": "wait_for", "selector": ".invoices-table"},
+        {"action": "for_each", "selector": ".invoice-row a[href*='download']", "do": [
+          {"action": "click_and_download_pdf"}
+        ]}
+      ],
+      "datev_subject_template": "Stripe Fees {month}/{year}",
+      "fallback_behavior": "tier3_human_ping",
+      "notes": "Only relevant if YOUR business uses Stripe to charge customers — these are fees Stripe charges you."
+    }
+  }
+}

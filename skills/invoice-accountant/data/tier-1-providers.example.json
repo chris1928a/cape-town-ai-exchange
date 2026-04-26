@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "description": "Email-based vendors. Gmail filter forwards each match to the accountant inbox. Edit this file to match your real vendors.",
+    "accountant_email_placeholder": "<your-id>@uploadmail.datev.de OR your-quickbooks-inbox@qbo.intuit.com",
+    "label": "Forwarded",
+    "schema_version": "1.0"
+  },
+  "providers": [
+    {
+      "id": "anthropic",
+      "name": "Anthropic API",
+      "category": "AI/SaaS",
+      "cycle": "monthly",
+      "filter_query": "from:receipts+anthropic@stripe.com OR from:billing@anthropic.com",
+      "expected_subject_pattern": "Receipt from Anthropic|Your Anthropic invoice",
+      "datev_subject_template": "Anthropic API {month}/{year}"
+    },
+    {
+      "id": "openai-stripe-receipt",
+      "name": "OpenAI (Stripe receipt)",
+      "category": "AI/SaaS",
+      "cycle": "monthly",
+      "filter_query": "from:receipts+openai@stripe.com",
+      "datev_subject_template": "OpenAI {month}/{year}",
+      "notes": "OpenAI often sends Stripe-hosted receipts even though primary billing is in their console — this catches them."
+    },
+    {
+      "id": "google-workspace",
+      "name": "Google Workspace",
+      "category": "SaaS/Productivity",
+      "cycle": "monthly",
+      "filter_query": "from:payments-noreply@google.com workspace",
+      "datev_subject_template": "Google Workspace {month}/{year}"
+    },
+    {
+      "id": "microsoft-365",
+      "name": "Microsoft 365",
+      "category": "SaaS/Productivity",
+      "cycle": "monthly",
+      "filter_query": "from:microsoft-noreply@microsoft.com OR from:msonlineservicesteam@microsoftonline.com subject:(invoice OR receipt OR rechnung)",
+      "datev_subject_template": "Microsoft 365 {month}/{year}"
+    },
+    {
+      "id": "stripe-receipts-catchall",
+      "name": "Stripe Receipts (catch-all)",
+      "category": "SaaS",
+      "cycle": "monthly",
+      "filter_query": "from:receipts+*@stripe.com has:attachment",
+      "datev_subject_template": "Stripe Receipt {sender} {date}",
+      "notes": "Catch-all for unknown Stripe-based SaaS. Runs AFTER specific filters as a safety net."
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "category": "Dev Tools",
+      "cycle": "monthly",
+      "filter_query": "from:billing@github.com OR from:receipts@github.com",
+      "datev_subject_template": "GitHub {month}/{year}"
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "category": "Dev Tools/Hosting",
+      "cycle": "monthly",
+      "filter_query": "from:invoice+statements@vercel.com OR from:noreply@vercel.com subject:invoice",
+      "datev_subject_template": "Vercel {month}/{year}"
+    },
+    {
+      "id": "aws",
+      "name": "AWS",
+      "category": "Cloud/Infrastructure",
+      "cycle": "monthly",
+      "filter_query": "from:no-reply-aws@amazon.com OR from:billing@amazon.com subject:(invoice OR statement)",
+      "datev_subject_template": "AWS {month}/{year}",
+      "notes": "AWS sends statement email; the actual PDF is in Billing Console (Tier 2 if you need the PDF specifically)."
+    },
+    {
+      "id": "linkedin",
+      "name": "LinkedIn (Premium/Sales Navigator)",
+      "category": "SaaS",
+      "cycle": "monthly",
+      "filter_query": "from:premium-billing@linkedin.com OR from:billing@linkedin.com",
+      "datev_subject_template": "LinkedIn {month}/{year}"
+    },
+    {
+      "id": "telecom-generic",
+      "name": "Telecom (placeholder)",
+      "category": "Telecommunications",
+      "cycle": "monthly",
+      "filter_query": "from:noreply@<your-telco>.de OR from:rechnung@<your-telco>.de",
+      "datev_subject_template": "Telecom {month}/{year}",
+      "notes": "Replace <your-telco> with Telekom, Vodafone, O2, etc."
+    }
+  ]
+}
